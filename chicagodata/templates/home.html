@@ -1,46 +1,618 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-
-    <!-- Bootstrap CSS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Simple Dashboard</title>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
+    <style>
+      {% load static %}
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          display: flex;
+        }
 
-    <title>Homepage</title>
+        #container {
+          display: flex;
+          align-items: flex-start;
+          width: 100%;
+        }
+
+        #sidebar {
+          background-color: black; /* Updated color */
+          color: #fff;
+          width: 20%;
+          padding: 20px;
+          height: 120vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          position: relative;
+          /* flex-grow: 1; */
+          /* max-height: 10vh; */
+          /* overflow-y: auto; */
+          /* overflow: hidden; */
+        }
+
+        #content {
+          width: 80%;
+          padding: 20px;
+        }
+
+        #user-image {
+          width: 150px;
+          height: 150px;
+          margin-top: 20px;
+        }
+
+        .nav-item {
+          display: flex;
+          align-items: center;
+          justify-content: center; /* Align items in the middle */
+          margin-bottom: 10px;
+          border: 1px solid #fff;
+          border-radius: 5px;
+          padding: 8px;
+          width: 80%; /* Set width to match the sidebar */
+          margin-left: 10%; /* Add left margin to center the items */
+        }
+
+        .nav-item i {
+          margin-right: 10px;
+        }
+
+        button {
+          border-radius: 20px;
+          border: 1px solid #ff4b2b;
+          background-color: #ff4b2b;
+          color: #ffffff;
+          font-size: 12px;
+          font-weight: bold;
+          padding: 12px 45px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          transition: transform 80ms ease-in;
+        }
+
+        button:active {
+          transform: scale(0.95);
+        }
+
+        button:focus {
+          outline: none;
+        }
+
+        button.ghost {
+          background-color: transparent;
+          border-color: #ffffff;
+        }
+
+        /* Add margin to the h2 element */
+        #sidebar h2 {
+          margin-top: 20px;
+          margin-bottom: 30px; /* Add gap between "Welcome, User!" and the nav bar */
+        }
+
+        /* Additional styles for the input boxes and slider */
+        /* Additional styles for the input boxes and slider */
+        .input-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 20px;
+          padding: 10px;
+          background-color: #f5f5f5;
+          border-radius: 5px;
+        }
+
+        .input-container input[type="text"] {
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
+
+        .input-container input[type="range"] {
+          -webkit-appearance: none;
+          /* width: 100%; */
+          width:150px;
+          height: 8px;
+          border-radius: 5px;
+          background-color: #d3d3d3;
+          outline: none;
+          margin-top: 10px;
+        }
+
+        .input-container input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          /* background-color: #FF416C; */
+          background-color: grey;
+          cursor: pointer;
+        }
+
+        .slider-label {
+          font-size: 14px;
+        }
+
+        .slider-value {
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+          /* Add styles for card layout */
+  .chart-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Optional styles to center the charts inside the cards */
+  .chart-card canvas {
+    margin: 0 auto;
+  }
+
+  #topfive{
+    background-color: white;
+  }
+  #day{
+    background-color: white;
+  }
+
+  .chart-type-filter-container {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+/* Styles for the chart type filter label */
+.chart-type-filter-label {
+  margin-right: 10px;
+}
+
+/* Styles for the chart type filter select dropdown */
+.chart-type-filter-select {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 14px;
+  background-color: white; /* Set the background color of the dropdown */
+  color: #333; /* Set the text color of the dropdown */
+  cursor: pointer; /* Show pointer cursor when hovering over the dropdown */
+  -webkit-appearance: none; /* Remove default arrow icon in Chrome and Safari */
+  -moz-appearance: none; /* Remove default arrow icon in Firefox */
+  appearance: none; /* Remove default arrow icon in other browsers */
+}
+
+/* Styles for the options in the chart type filter dropdown */
+.chart-type-filter-select option {
+  padding: 8px;
+  background-color: #f5f5f5; /* Set the background color of each option */
+  color: #333; /* Set the text color of each option */
+}
+    </style>
   </head>
   <body>
-    <h1>Home Page</h1>
-    {% if user.is_authenticated %}
-    <h2>Welcome {{user.username}}</h2>
-    {% endif %}
-    <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+    <div id="container">
+      <div id="sidebar">
+        <img src="{% static 'user.png' %}" alt="User Image" id="user-image" /></br>
+        {% if user.is_authenticated %}
+        <h3 style="font-family: Helvetica, sans-serif;font-size: 20px;">Welcome {{user.username}}!</h3>
+        {% endif %}
+      </br>
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" id="logout-btn">Logout</button>
+        </form>
+      </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"
-    ></script>
+      <div id="content" style="margin: 0 auto;">
+        <h2 style="font-family: Helvetica, sans-serif;font-size: 25px;">CHICAGO CRIME DATA ANALYSIS</h2>
+        <!-- <P style="font-family: Helvetica, sans-serif;color:grey;text-align: justify;">This dataset reflects reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 2001 to present, minus the most recent seven days. Data is extracted from the Chicago Police Department's CLEAR (Citizen Law Enforcement Analysis and Reporting) system. In order to protect the privacy of crime victims, addresses are shown at the block level only and specific locations are not identified. Should you have questions about this dataset, you may contact the Data Fulfillment and Analysis Division of the Chicago Police Department at DFA@ChicagoPolice.org.</P> -->
+        <form method="post" id="crime-analysis-form">
+            {% csrf_token %}
+            <div class="input-container">
+                <label class="slider-label" for="latitude">Latitude:</label>
+                <input type="text" id="latitude" placeholder="Latitude" value="41.8403" name="lat">
+                <label class="slider-label" for="longitude">Longitude:</label>
+                <input type="text" id="longitude" placeholder="Longitude" value="-87.6137" name="lon">
+                <label class="slider-label" for="radius">Radius:</label>
+                <input type="range" id="radius" min="1" max="20" value="10" name="rad">
+                <span class="slider-value" id="radius-value">10</span>
+
+                    <button type="submit" id="logout-btn" style="background-color:#FF416C" name="analysis_submit">Analyize</button>
+
+            </div>
+        </form>
+    </br>
+<!-- ... (existing HTML code) -->
+
+<div class="chart-type-filter-container">
+    <label class="chart-type-filter-label" for="chart-type-filter">Filter:</label>
+    <select id="chart-type-filter" class="chart-type-filter-select">
+      <option value="all">All</option>
+      <option value="bar">Bar Chart</option>
+      <option value="line">Line Chart</option>
+      <option value="pie">Pie Chart</option>
+    </select>
+  </div>
+  
+  <!-- ... (existing HTML code) -->
+  
+        </br>
+    </br>
+        <h2 style="font-family: Helvetica, sans-serif;font-size: 25px;">TOP FIVE CRIMES IN THE LOCATION</h2>
+
+
+        <div class="input-container" id="topfive">
+            <!-- Bar Chart Card -->
+            <div class="chart-card" id="bar-chart-card">
+              <h4>Bar Chart</h4>
+              <div id="bar-chart-container" style="width: 100%;">
+                <canvas id="barChartCanvas" width="430" height="250" style="background-color: white;"></canvas>
+              </div>
+            </div>
+          
+            <!-- Pie Chart Card -->
+            <div class="chart-card" id="pie-chart-card">
+              <h4>Pie Chart</h4>
+              <div id="pie-chart-container" style="width: 100%;">
+                <canvas id="pieChartCanvas" width="430" height="250" style="background-color: white;"></canvas>
+              </div>
+            </div>
+          
+            <!-- Line Chart Card -->
+            <div class="chart-card" id="line-chart-card">
+              <h4>Line Chart</h4>
+              <div id="line-chart-container" style="width: 100%;">
+                <canvas id="lineChartCanvas" width="430" height="250" style="background-color: white;"></canvas>
+              </div>
+            </div>
+          
+        </div>
+
+    </br>
+    <h2 style="font-family: Helvetica, sans-serif;font-size: 25px;">CRIME RATE BY DAY OF WEEK</h2>
+
+    
+    <div class="input-container" id="day">
+
+        <div class="chart-card" id="bar-chart-card-day">
+            <h4>Bar Chart</h4>
+            <div id="bar-chart-container-day" style="width: 100%;">
+                <canvas id="barChartDayCanvas" width="430" height="250" style="background-color: white;"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card" id="pie-chart-card-day">
+            <h4>Pie Chart</h4>
+            <div id="pie-chart-container-day" style="width: 100%;">
+                <canvas id="pieChartDayCanvas" width="430" height="250" style="background-color: white;"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card" id="line-chart-card-day">
+            <h4>Line Chart</h4>
+            <div id="line-chart-container-day" style="width: 100%;">
+                <canvas id="lineChartDayCanvas" width="430" height="250" style="background-color: white;"></canvas>
+            </div>
+        </div>
+
+    </div>
+        <!-- Add your analysis charts here -->
+        <!-- You can use the same Chart.js charts you used in the previous example -->
+
+
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.js"></script>
+      <script>
+  function showSelectedChart(selectedChartType) {
+    b1 = document.getElementById("bar-chart-card")
+    p1 = document.getElementById("pie-chart-card")
+    l1 = document.getElementById("line-chart-card")
+    b2 = document.getElementById("bar-chart-card-day")
+    p2 = document.getElementById("pie-chart-card-day")
+    l2 = document.getElementById("line-chart-card-day")
+    // const chartCards = document.querySelectorAll('.chart-card');
+
+    if (selectedChartType === "bar"){
+        b1.style.display = 'block'
+        b2.style.display = 'block'
+        p1.style.display = 'none'
+        p2.style.display = 'none'
+        l1.style.display = 'none'
+        l2.style.display = 'none'
+
+    }else if (selectedChartType === "pie"){
+        b1.style.display = 'none'
+        b2.style.display = 'none'
+        p1.style.display = 'block'
+        p2.style.display = 'block'
+        l1.style.display = 'none'
+        l2.style.display = 'none'
+    }else if (selectedChartType === "line"){
+        b1.style.display = 'none'
+        b2.style.display = 'none'
+        p1.style.display = 'none'
+        p2.style.display = 'none'
+        l1.style.display = 'block'
+        l2.style.display = 'block'
+    }else{
+        b1.style.display = 'block'
+        b2.style.display = 'block'
+        p1.style.display = 'block'
+        p2.style.display = 'block'
+        l1.style.display = 'block'
+        l2.style.display = 'block'
+    }
+  }
+
+  // Event listener for the chart type filter
+  document.getElementById('chart-type-filter').addEventListener('change', function() {
+    const selectedChartType = this.value;
+    console.log(selectedChartType)
+
+    showSelectedChart(selectedChartType);
+  });
+
+  // Filter initialization (show all charts when the page loads)
+  showSelectedChart('all');
+
+        </script>
+    <script>
+    // Your JavaScript code to handle the form submission and chart display here
+    document.getElementById("crime-analysis-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        // Get the form data
+        const formData = new FormData(event.target);
+        const latitude = formData.get("lat");
+        const longitude = formData.get("lon");
+        const radius = formData.get("rad");
+
+        // Send a POST request to the crime_analysis endpoint
+        fetch("{% url 'home' %}", {
+            method: "POST",
+            // headers: {
+            //     "X-CSRFToken": "{% csrf_token %}",
+            // },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Call the function to display the charts with the received data
+            // console.log("hellooooo")
+            // console.log(data)
+            displayCharts(data);
+            displayDayOfWeekCharts(data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    });
+
+    // Function to display the charts using Chart.js
+    function displayCharts(chartData) {
+        const barChartContext = document.getElementById("barChartCanvas").getContext("2d");
+        const pieChartContext = document.getElementById("pieChartCanvas").getContext("2d");
+        const lineChartContext = document.getElementById("lineChartCanvas").getContext("2d");
+        // alert()
+
+        // Bar Chart
+        new Chart(barChartContext, {
+            type: "bar",
+            data: {
+                labels: chartData.bar_chart_data.labels,
+                datasets: [{
+                    label: "Crime Count",
+                    data: chartData.bar_chart_data.data,
+                    backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            precision: 0,
+                        },
+                    }],
+                },
+            },
+        });
+
+        // Pie Chart
+        new Chart(pieChartContext, {
+            type: "pie",
+            data: {
+                labels: chartData.pie_chart_data.labels,
+                datasets: [{
+                    data: chartData.pie_chart_data.data,
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 0.5)",
+                        "rgba(54, 162, 235, 0.5)",
+                        "rgba(255, 206, 86, 0.5)",
+                        "rgba(75, 192, 192, 0.5)",
+                        "rgba(153, 102, 255, 0.5)",
+                    ],
+                    borderColor: [
+                        "rgba(255, 99, 132, 1)",
+                        "rgba(54, 162, 235, 1)",
+                        "rgba(255, 206, 86, 1)",
+                        "rgba(75, 192, 192, 1)",
+                        "rgba(153, 102, 255, 1)",
+                    ],
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: "right",
+                },
+            },
+        });
+
+        // Line Chart
+        new Chart(lineChartContext, {
+            type: "line",
+            data: {
+                labels: chartData.line_chart_data.labels,
+                datasets: [{
+                    label: "Crime Count",
+                    data: chartData.line_chart_data.data,
+                    backgroundColor: "rgba(75, 192, 192, 0.5)",
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    borderWidth: 1,
+                    fill: true,
+                }],
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            precision: 0,
+                        },
+                    }],
+                },
+            },
+        });
+        
+    }
+    function displayDayOfWeekCharts(chartData) {
+    const barChartContextDay = document.getElementById("barChartDayCanvas").getContext("2d");
+    const pieChartContextDay = document.getElementById("pieChartDayCanvas").getContext("2d");
+    const lineChartContextDay = document.getElementById("lineChartDayCanvas").getContext("2d");
+    const chartTypeFilter = document.getElementById("chart-type-filter");
+    const chartType = chartTypeFilter.value;
+
+
+    // Bar Chart - Day of the Week
+    new Chart(barChartContextDay, {
+        type: "bar",
+        data: {
+            labels: chartData.bar_chart_data_day.labels,
+            datasets: [{
+                label: "Crime Count",
+                data: chartData.bar_chart_data_day.data,
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                borderColor: "rgba(255, 99, 132, 1)",
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                display: false,
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        precision: 0,
+                    },
+                }],
+            },
+        },
+    });
+
+    // Pie Chart - Day of the Week
+    new Chart(pieChartContextDay, {
+        type: "pie",
+        data: {
+            labels: chartData.pie_chart_data_day.labels,
+            datasets: [{
+                data: chartData.pie_chart_data_day.data,
+                backgroundColor: [
+                    "rgba(255, 99, 132, 0.5)",
+                    "rgba(54, 162, 235, 0.5)",
+                    "rgba(255, 206, 86, 0.5)",
+                    "rgba(75, 192, 192, 0.5)",
+                    "rgba(153, 102, 255, 0.5)",
+                    "rgba(255, 159, 64, 0.5)",
+                    "rgba(94, 90, 112, 0.5)",
+                ],
+                borderColor: [
+                    "rgba(255, 99, 132, 1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)",
+                    "rgba(94, 90, 112, 1)",
+                ],
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: "right",
+            },
+        },
+    });
+
+    // Line Chart - Day of the Week
+    new Chart(lineChartContextDay, {
+        type: "line",
+        data: {
+            labels: chartData.line_chart_data_day.labels,
+            datasets: [{
+                label: "Crime Count",
+                data: chartData.line_chart_data_day.data,
+                backgroundColor: "rgba(75, 192, 192, 0.5)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+                fill: true,
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                display: false,
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        precision: 0,
+                    },
+                }],
+            },
+        },
+    });
+
+    
+}
+
+</script>
+      <script>
+        const radiusInput = document.getElementById('radius');
+        const radiusValue = document.getElementById('radius-value');
+  
+        radiusInput.addEventListener('input', function() {
+          radiusValue.textContent = radiusInput.value;
+        });
+      </script>
+    </div>
   </body>
 </html>

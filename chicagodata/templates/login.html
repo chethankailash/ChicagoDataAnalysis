@@ -261,7 +261,16 @@ footer a {
     color: #3c97bf;
     text-decoration: none;
 }
+.social-container .social img {
+    width: 40px;
+    height: 40px;
+    /* margin-right: 10px; Add some space between the icons */
+}
 
+/* You can add additional styling if needed, such as hover effects */
+.social-container .social img:hover {
+    opacity: 0.7;
+}
     </style>
 
 
@@ -274,9 +283,9 @@ footer a {
 				{% csrf_token %}
                 <h1>Create Account</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+					<a href="#" class="social"><img src="{% static 'facebook.png' %}" alt="Facebook"></a>
+					<a href="#" class="social"><img src="{% static 'google.png' %}" alt="Google Plus"></a>
+					<a href="#" class="social"><img src="{% static 'linkedin.png' %}" alt="LinkedIn"></a>
                 </div>
                 <span>or use your email for registration</span>
                 <input type="text" placeholder="Name" name="username" />
@@ -291,9 +300,9 @@ footer a {
 				{% csrf_token %}
                 <h1>Sign in</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+					<a href="#" class="social"><img src="{% static 'facebook.png' %}" alt="Facebook"></a>
+					<a href="#" class="social"><img src="{% static 'google.png' %}" alt="Google Plus"></a>
+					<a href="#" class="social"><img src="{% static 'linkedin.png' %}" alt="LinkedIn"></a>
                 </div>
                 <span>or use your account</span>
                 <input type="text" placeholder="User Name" name="username1" />
