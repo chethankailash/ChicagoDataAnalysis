@@ -1,0 +1,6 @@
+Django>=4.2
+djangorestframework>=3.14
+requests>=2.31
+gunicorn>=20.1
+psycopg2>=2.9  # If you're using PostgreSQL, otherwise remove or replace with your database package
+django-cors-headers>=4.0  # For handling Cross-Origin Resource Sharing (CORS)
